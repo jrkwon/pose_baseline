@@ -1,3 +1,8 @@
+## Notes
+
+This is a slightly modified version of the original to cooperate with OpenPose.
+
+
 ## 3d-pose-baseline
 
 This is the code for the paper
