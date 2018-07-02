@@ -61,7 +61,12 @@ def read_openpose_json(smooth=True, *args):
             xy.append(_data[o+1])
 
         # get frame index from openpose 12 padding
-        frame_indx = re.findall("(\d+)", file_name)
+        # kwon: 
+        #   ignore the source movie filename that may have numeric characters.
+        #   json filename: movie_name_000000000048_keypoints.json
+        #   the second last '_' is the position where we can use the frame number of the movie. 
+        #frame_indx = re.findall("(\d+)", file_name)
+        frame_indx = re.findall("(\d+)", file_name[file_name[:file_name.rindex('_')].rindex('_'):])
         logger.debug("found {0} for frame {1}".format(xy, str(int(frame_indx[0]))))
         #add xy to frame
         cache[int(frame_indx[0])] = xy
@@ -86,9 +91,12 @@ def read_openpose_json(smooth=True, *args):
 
     logger.info("start smoothing")
 
+    # kwon: ignore the source movie filename that may have numeric characters.
     # create frame blocks
-    head_frame_block = [int(re.findall("(\d+)", o)[0]) for o in json_files[:4]]
-    tail_frame_block = [int(re.findall("(\d+)", o)[0]) for o in json_files[-4:]]
+    #head_frame_block = [int(re.findall("(\d+)", o)[0]) for o in json_files[:4]]
+    #tail_frame_block = [int(re.findall("(\d+)", o)[0]) for o in json_files[-4:]]
+    head_frame_block = [int(re.findall("(\d+)", o[o[:o.rindex('_')].rindex('_'):])[0]) for o in json_files[:4]]
+    tail_frame_block = [int(re.findall("(\d+)", o[o[:o.rindex('_')].rindex('_'):])[0]) for o in json_files[-4:]]
 
     ### smooth by median value, n frames 
     for frame, xy in cache.items():
